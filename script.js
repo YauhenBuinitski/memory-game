@@ -18,3 +18,11 @@ const leaderboardBtn = createElement("button", "header__btn", "Leaderboard");
 header.append(newGameBtn, leaderboardBtn);
 
 document.body.append(header);
+
+const stats = createElement("div", "stats");
+const movesTexst = createElement("p", "stats__text", "Moves: 0");
+const pairsText = createElement("p", "stats__text", "Pairs: 0 / 8");
+
+stats.append(movesTexst, pairsText);
+
+document.body.append(stats);
