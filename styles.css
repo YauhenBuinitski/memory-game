@@ -45,3 +45,7 @@ body {
   background-color: #333;
   border-radius: 10px;
 }
+
+.card.open .card__back {
+  display: none;
+}

@@ -61,6 +61,9 @@ function shuffle(array) {
 
 shuffle(cardValues);
 
+let firstCard = null;
+let lockBoard = false;
+
 for (let i = 0; i < 16; i += 1) {
   const card = createElement("div", "card");
   const value = cardValues[i];
@@ -72,4 +75,41 @@ for (let i = 0; i < 16; i += 1) {
 
   card.append(valueText, cardBack);
   board.append(card);
+  card.addEventListener("click", handleCardClick);
+}
+
+function handleCardClick() {
+  if (lockBoard) {
+    return;
+  }
+
+  const card = this;
+
+  if (card.classList.contains("open") || card.classList.contains("matched")) {
+    return;
+  }
+
+  if (firstCard === null) {
+    firstCard = card;
+    card.classList.add("open");
+    return;
+  }
+
+  card.classList.add("open");
+  lockBoard = true;
+
+  if (card.dataset.value === firstCard.dataset.value) {
+    card.classList.add("matched");
+    firstCard.classList.add("matched");
+    firstCard = null;
+    lockBoard = false;
+    return;
+  }
+
+  setTimeout(function () {
+    card.classList.remove("open");
+    firstCard.classList.remove("open");
+    firstCard = null;
+    lockBoard = false;
+  }, 1000);
 }
