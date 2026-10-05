@@ -20,10 +20,10 @@ header.append(newGameBtn, leaderboardBtn);
 document.body.append(header);
 
 const stats = createElement("div", "stats");
-const movesTexst = createElement("p", "stats__text", "Moves: 0");
+const movesText = createElement("p", "stats__text", "Moves: 0");
 const pairsText = createElement("p", "stats__text", "Pairs: 0 / 8");
 
-stats.append(movesTexst, pairsText);
+stats.append(movesText, pairsText);
 
 document.body.append(stats);
 
@@ -49,6 +49,17 @@ const cardValues = [
   "🥝",
   "🥝",
 ];
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+  }
+}
+
+shuffle(cardValues);
 
 for (let i = 0; i < 16; i += 1) {
   const card = createElement("div", "card");
