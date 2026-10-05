@@ -119,3 +119,38 @@ function handleCardClick() {
     lockBoard = false;
   }, 1000);
 }
+
+function createModal() {
+  const modal = createElement("div", "modal");
+  const overlay = createElement("div", "modal__overlay");
+  const content = createElement("div", "modal__content");
+  const closeBtn = createElement("button", "modal__close", "×");
+
+  content.append(closeBtn);
+  modal.append(overlay, content);
+
+  return modal;
+}
+
+function openModal(content) {
+  const modal = createModal();
+  const modalContent = modal.querySelector(".modal__content");
+  modalContent.append(content);
+  document.body.append(modal);
+  modal.classList.add("open");
+  document.body.classList.add("no-scroll");
+
+  const closeBtn = modal.querySelector(".modal__close");
+  closeBtn.addEventListener("click", closeModal);
+}
+
+function closeModal() {
+  const modal = document.querySelector(".modal");
+  if (!modal) {
+    return;
+  }
+
+  modal.classList.remove("open");
+  document.body.classList.remove("no-scroll");
+  modal.remove();
+}
