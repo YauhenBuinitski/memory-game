@@ -149,6 +149,10 @@ function openModal(content) {
 
   const closeBtn = modal.querySelector(".modal__close");
   closeBtn.addEventListener("click", closeModal);
+  const overlay = modal.querySelector(".modal__overlay");
+  overlay.addEventListener("click", closeModal);
+
+  document.addEventListener("keydown", handleEscape);
 }
 
 function closeModal() {
@@ -160,6 +164,13 @@ function closeModal() {
   modal.classList.remove("open");
   document.body.classList.remove("no-scroll");
   modal.remove();
+  document.removeEventListener("keydown", handleEscape);
+}
+
+function handleEscape(event) {
+  if (event.key === "Escape") {
+    closeModal();
+  }
 }
 
 function getWinContent() {
