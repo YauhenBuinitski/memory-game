@@ -63,6 +63,8 @@ shuffle(cardValues);
 
 let firstCard = null;
 let lockBoard = false;
+let moves = 0;
+let pairs = 0;
 
 for (let i = 0; i < 16; i += 1) {
   const card = createElement("div", "card");
@@ -97,10 +99,14 @@ function handleCardClick() {
 
   card.classList.add("open");
   lockBoard = true;
+  moves += 1;
+  movesText.textContent = "Moves: " + moves;
 
   if (card.dataset.value === firstCard.dataset.value) {
     card.classList.add("matched");
     firstCard.classList.add("matched");
+    pairs += 1;
+    pairsText.textContent = "Pairs: " + pairs + " / 8";
     firstCard = null;
     lockBoard = false;
     return;
