@@ -214,3 +214,49 @@ function formatDate(dateString) {
 
   return dayStr + "." + monthStr + "." + year;
 }
+
+function getResults() {
+  const saved = localStorage.getItem("results");
+  return saved ? JSON.parse(saved) : [];
+}
+
+function getLeaderboardContent() {
+  const content = createElement("div", "leaderboard");
+  const title = createElement("h2", "leaderboard__title", "Leaderboard");
+  const results = getResults();
+
+  if (results.length === 0) {
+    const emptyText = createElement(
+      "p",
+      "leaderboard__empty",
+      "No results yet",
+    );
+    content.append(title, emptyText);
+    return content;
+  }
+
+  const list = createElement("ol", "leaderboard__list");
+
+  results.forEach(function (result, index) {
+    const item = createElement("li", "leaderboard__item");
+    const text = createElement(
+      "span",
+      "leaderboard__text",
+      result.moves + " moves — " + formatDate(result.date),
+    );
+    item.append(text);
+    list.append(item);
+  });
+
+  content.append(title, list);
+
+  const closeButton = createElement("button", "leaderboard__btn", "Close");
+  closeButton.addEventListener("click", closeModal);
+  content.append(closeButton);
+
+  return content;
+}
+
+leaderboardBtn.addEventListener("click", function () {
+  openModal(getLeaderboardContent());
+});
