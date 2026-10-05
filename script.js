@@ -26,3 +26,7 @@ const pairsText = createElement("p", "stats__text", "Pairs: 0 / 8");
 stats.append(movesTexst, pairsText);
 
 document.body.append(stats);
+
+const board = createElement("div", "board");
+
+document.body.append(board);
