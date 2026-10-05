@@ -30,3 +30,8 @@ document.body.append(stats);
 const board = createElement("div", "board");
 
 document.body.append(board);
+
+for (let i = 0; i < 16; i += 1) {
+  const card = createElement("div", "card");
+  board.append(card);
+}
