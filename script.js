@@ -109,6 +109,7 @@ function handleCardClick() {
     pairsText.textContent = "Pairs: " + pairs + " / 8";
 
     if (pairs === 8) {
+      saveResult();
       openModal(getWinContent());
       return;
     }
@@ -178,4 +179,27 @@ function getWinContent() {
   });
 
   return content;
+}
+
+function saveResult() {
+  const result = {
+    moves: moves,
+    date: new Date().toISOString(),
+  };
+
+  const saved = localStorage.getItem("results");
+  const results = saved ? JSON.parse(saved) : [];
+
+  results.push(result);
+
+  results.sort(function (a, b) {
+    if (a.moves !== b.moves) {
+      return a.moves - b.moves;
+    }
+    return new Date(a.date) - new Date(b.date);
+  });
+
+  const top10 = results.slice(0, 10);
+
+  localStorage.setItem("results", JSON.stringify(top10));
 }
