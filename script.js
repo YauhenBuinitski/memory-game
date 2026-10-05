@@ -31,7 +31,7 @@ const board = createElement("div", "board");
 
 document.body.append(board);
 
-const cardValues = [
+let cardValues = [
   "🍎",
   "🍎",
   "🍌",
@@ -49,6 +49,7 @@ const cardValues = [
   "🥝",
   "🥝",
 ];
+const initialValues = [...cardValues];
 
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i -= 1) {
@@ -65,6 +66,7 @@ let firstCard = null;
 let lockBoard = false;
 let moves = 0;
 let pairs = 0;
+let timeoutId = null;
 
 for (let i = 0; i < 16; i += 1) {
   const card = createElement("div", "card");
@@ -119,11 +121,12 @@ function handleCardClick() {
     return;
   }
 
-  setTimeout(function () {
+  timeoutId = setTimeout(function () {
     card.classList.remove("open");
     firstCard.classList.remove("open");
     firstCard = null;
     lockBoard = false;
+    timeoutId = null;
   }, 1000);
 }
 
@@ -184,10 +187,7 @@ function getWinContent() {
 
   closeButton.addEventListener("click", closeModal);
 
-  newGameButton.addEventListener("click", function () {
-    closeModal();
-    location.reload();
-  });
+  newGameButton.addEventListener("click", resetGame);
 
   return content;
 }
@@ -268,6 +268,44 @@ function getLeaderboardContent() {
   return content;
 }
 
+function resetGame() {
+  closeModal();
+
+  if (timeoutId !== null) {
+    clearTimeout(timeoutId);
+    timeoutId = null;
+  }
+
+  firstCard = null;
+  lockBoard = false;
+  moves = 0;
+  pairs = 0;
+
+  movesText.textContent = "Moves: 0";
+  pairsText.textContent = "Pairs: 0 / 8";
+
+  cardValues = [...initialValues];
+  shuffle(cardValues);
+
+  board.replaceChildren();
+
+  for (let i = 0; i < 16; i += 1) {
+    const card = createElement("div", "card");
+    const value = cardValues[i];
+
+    card.dataset.value = value;
+
+    const valueText = createElement("span", "card__value", value);
+    const cardBack = createElement("span", "card__back");
+
+    card.append(valueText, cardBack);
+    board.append(card);
+    card.addEventListener("click", handleCardClick);
+  }
+}
+
 leaderboardBtn.addEventListener("click", function () {
   openModal(getLeaderboardContent());
 });
+
+newGameBtn.addEventListener("click", resetGame);
