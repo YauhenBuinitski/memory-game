@@ -31,7 +31,34 @@ const board = createElement("div", "board");
 
 document.body.append(board);
 
+const cardValues = [
+  "🍎",
+  "🍎",
+  "🍌",
+  "🍌",
+  "🍇",
+  "🍇",
+  "🍓",
+  "🍓",
+  "🍒",
+  "🍒",
+  "🍑",
+  "🍑",
+  "🍍",
+  "🍍",
+  "🥝",
+  "🥝",
+];
+
 for (let i = 0; i < 16; i += 1) {
   const card = createElement("div", "card");
+  const value = cardValues[i];
+
+  card.dataset.value = value;
+
+  const valueText = createElement("span", "card__value", value);
+  const cardBack = createElement("span", "card__back");
+
+  card.append(valueText, cardBack);
   board.append(card);
 }
