@@ -100,3 +100,32 @@ body {
 body.no-scroll {
   overflow: hidden;
 }
+
+.win {
+  text-align: center;
+}
+
+.win__title {
+  margin: 0 0 20px;
+  font-size: 32px;
+}
+
+.win__moves {
+  margin: 0 0 30px;
+  font-size: 20px;
+}
+
+.win__btn {
+  margin: 0 5px;
+  padding: 10px 20px;
+  border: 1px solid #333;
+  border-radius: 5px;
+  background: transparent;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.win__btn:hover {
+  background-color: #333;
+  color: #fff;
+}

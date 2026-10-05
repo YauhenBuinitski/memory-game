@@ -107,6 +107,12 @@ function handleCardClick() {
     firstCard.classList.add("matched");
     pairs += 1;
     pairsText.textContent = "Pairs: " + pairs + " / 8";
+
+    if (pairs === 8) {
+      openModal(getWinContent());
+      return;
+    }
+
     firstCard = null;
     lockBoard = false;
     return;
@@ -153,4 +159,23 @@ function closeModal() {
   modal.classList.remove("open");
   document.body.classList.remove("no-scroll");
   modal.remove();
+}
+
+function getWinContent() {
+  const content = createElement("div", "win");
+  const title = createElement("h2", "win__title", "You won!");
+  const movesInfo = createElement("p", "win__moves", "Moves: " + moves);
+  const newGameButton = createElement("button", "win__btn", "New Game");
+  const closeButton = createElement("button", "win__btn", "Close");
+
+  content.append(title, movesInfo, newGameButton, closeButton);
+
+  closeButton.addEventListener("click", closeModal);
+
+  newGameButton.addEventListener("click", function () {
+    closeModal();
+    location.reload();
+  });
+
+  return content;
 }
