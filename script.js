@@ -1,0 +1,311 @@
+function createElement(tag, className, text) {
+  const element = document.createElement(tag);
+
+  if (className) {
+    element.className = className;
+  }
+
+  if (text) {
+    element.textContent = text;
+  }
+  return element;
+}
+
+const header = createElement("header", "header");
+const newGameBtn = createElement("button", "header__btn", "New Game");
+const leaderboardBtn = createElement("button", "header__btn", "Leaderboard");
+
+header.append(newGameBtn, leaderboardBtn);
+
+document.body.append(header);
+
+const stats = createElement("div", "stats");
+const movesText = createElement("p", "stats__text", "Moves: 0");
+const pairsText = createElement("p", "stats__text", "Pairs: 0 / 8");
+
+stats.append(movesText, pairsText);
+
+document.body.append(stats);
+
+const board = createElement("div", "board");
+
+document.body.append(board);
+
+let cardValues = [
+  "🍎",
+  "🍎",
+  "🍌",
+  "🍌",
+  "🍇",
+  "🍇",
+  "🍓",
+  "🍓",
+  "🍒",
+  "🍒",
+  "🍑",
+  "🍑",
+  "🍍",
+  "🍍",
+  "🥝",
+  "🥝",
+];
+const initialValues = [...cardValues];
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+  }
+}
+
+shuffle(cardValues);
+
+let firstCard = null;
+let lockBoard = false;
+let moves = 0;
+let pairs = 0;
+let timeoutId = null;
+
+for (let i = 0; i < 16; i += 1) {
+  const card = createElement("div", "card");
+  const value = cardValues[i];
+
+  card.dataset.value = value;
+
+  const valueText = createElement("span", "card__value", value);
+  const cardBack = createElement("span", "card__back");
+
+  card.append(valueText, cardBack);
+  board.append(card);
+  card.addEventListener("click", handleCardClick);
+}
+
+function handleCardClick() {
+  if (lockBoard) {
+    return;
+  }
+
+  const card = this;
+
+  if (card.classList.contains("open") || card.classList.contains("matched")) {
+    return;
+  }
+
+  if (firstCard === null) {
+    firstCard = card;
+    card.classList.add("open");
+    return;
+  }
+
+  card.classList.add("open");
+  lockBoard = true;
+  moves += 1;
+  movesText.textContent = "Moves: " + moves;
+
+  if (card.dataset.value === firstCard.dataset.value) {
+    card.classList.add("matched");
+    firstCard.classList.add("matched");
+    pairs += 1;
+    pairsText.textContent = "Pairs: " + pairs + " / 8";
+
+    if (pairs === 8) {
+      saveResult();
+      openModal(getWinContent());
+      return;
+    }
+
+    firstCard = null;
+    lockBoard = false;
+    return;
+  }
+
+  timeoutId = setTimeout(function () {
+    card.classList.remove("open");
+    firstCard.classList.remove("open");
+    firstCard = null;
+    lockBoard = false;
+    timeoutId = null;
+  }, 1000);
+}
+
+function createModal() {
+  const modal = createElement("div", "modal");
+  const overlay = createElement("div", "modal__overlay");
+  const content = createElement("div", "modal__content");
+  const closeBtn = createElement("button", "modal__close", "×");
+
+  content.append(closeBtn);
+  modal.append(overlay, content);
+
+  return modal;
+}
+
+function openModal(content) {
+  const modal = createModal();
+  const modalContent = modal.querySelector(".modal__content");
+  modalContent.append(content);
+  document.body.append(modal);
+  modal.classList.add("open");
+  document.body.classList.add("no-scroll");
+
+  const closeBtn = modal.querySelector(".modal__close");
+  closeBtn.addEventListener("click", closeModal);
+  const overlay = modal.querySelector(".modal__overlay");
+  overlay.addEventListener("click", closeModal);
+
+  document.addEventListener("keydown", handleEscape);
+}
+
+function closeModal() {
+  const modal = document.querySelector(".modal");
+  if (!modal) {
+    return;
+  }
+
+  modal.classList.remove("open");
+  document.body.classList.remove("no-scroll");
+  modal.remove();
+  document.removeEventListener("keydown", handleEscape);
+}
+
+function handleEscape(event) {
+  if (event.key === "Escape") {
+    closeModal();
+  }
+}
+
+function getWinContent() {
+  const content = createElement("div", "win");
+  const title = createElement("h2", "win__title", "You won!");
+  const movesInfo = createElement("p", "win__moves", "Moves: " + moves);
+  const newGameButton = createElement("button", "win__btn", "New Game");
+  const closeButton = createElement("button", "win__btn", "Close");
+
+  content.append(title, movesInfo, newGameButton, closeButton);
+
+  closeButton.addEventListener("click", closeModal);
+
+  newGameButton.addEventListener("click", resetGame);
+
+  return content;
+}
+
+function saveResult() {
+  const result = {
+    moves: moves,
+    date: new Date().toISOString(),
+  };
+
+  const saved = localStorage.getItem("results");
+  const results = saved ? JSON.parse(saved) : [];
+
+  results.push(result);
+
+  results.sort(function (a, b) {
+    if (a.moves !== b.moves) {
+      return a.moves - b.moves;
+    }
+    return new Date(a.date) - new Date(b.date);
+  });
+
+  const top10 = results.slice(0, 10);
+
+  localStorage.setItem("results", JSON.stringify(top10));
+}
+
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  const dayStr = day < 10 ? "0" + day : "" + day;
+  const monthStr = month < 10 ? "0" + month : "" + month;
+
+  return dayStr + "." + monthStr + "." + year;
+}
+
+function getResults() {
+  const saved = localStorage.getItem("results");
+  return saved ? JSON.parse(saved) : [];
+}
+
+function getLeaderboardContent() {
+  const content = createElement("div", "leaderboard");
+  const title = createElement("h2", "leaderboard__title", "Leaderboard");
+  const results = getResults();
+
+  if (results.length === 0) {
+    const emptyText = createElement(
+      "p",
+      "leaderboard__empty",
+      "No results yet",
+    );
+    content.append(title, emptyText);
+    return content;
+  }
+
+  const list = createElement("ol", "leaderboard__list");
+
+  results.forEach(function (result, index) {
+    const item = createElement("li", "leaderboard__item");
+    const text = createElement(
+      "span",
+      "leaderboard__text",
+      result.moves + " moves — " + formatDate(result.date),
+    );
+    item.append(text);
+    list.append(item);
+  });
+
+  content.append(title, list);
+
+  const closeButton = createElement("button", "leaderboard__btn", "Close");
+  closeButton.addEventListener("click", closeModal);
+  content.append(closeButton);
+
+  return content;
+}
+
+function resetGame() {
+  closeModal();
+
+  if (timeoutId !== null) {
+    clearTimeout(timeoutId);
+    timeoutId = null;
+  }
+
+  firstCard = null;
+  lockBoard = false;
+  moves = 0;
+  pairs = 0;
+
+  movesText.textContent = "Moves: 0";
+  pairsText.textContent = "Pairs: 0 / 8";
+
+  cardValues = [...initialValues];
+  shuffle(cardValues);
+
+  board.replaceChildren();
+
+  for (let i = 0; i < 16; i += 1) {
+    const card = createElement("div", "card");
+    const value = cardValues[i];
+
+    card.dataset.value = value;
+
+    const valueText = createElement("span", "card__value", value);
+    const cardBack = createElement("span", "card__back");
+
+    card.append(valueText, cardBack);
+    board.append(card);
+    card.addEventListener("click", handleCardClick);
+  }
+}
+
+leaderboardBtn.addEventListener("click", function () {
+  openModal(getLeaderboardContent());
+});
+
+newGameBtn.addEventListener("click", resetGame);
